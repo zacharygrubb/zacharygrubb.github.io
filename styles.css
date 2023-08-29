@@ -1,0 +1,20 @@
+table {
+    display: block;
+}
+
+td {
+    border: 2px solid black;
+    width: 200px;
+    overflow: hidden;
+    white-space: wrap;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+
+h2 {
+    height: 10px;
+}
+
+div {
+    text-align: center;
+}
