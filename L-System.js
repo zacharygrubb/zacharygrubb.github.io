@@ -19,7 +19,6 @@ const rules = {
     E : ['+D', '-CA'],
     F : ['--G------B', '--G------B'],
     G : ['A++D', 'F'],
-    possible : ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
     gestures : ['static', 'trills', 'tremoli', 'glissandi', 'arpeggiation', 'contrapuntal', 'articulation']
 };
 const startingRules = [true, true, true, true, true, true, true];
@@ -58,7 +57,7 @@ function count(str, char, flip) {
     }
 }
 
-function nextGeneration(sentence, generations, key, change) {
+function nextGeneration(sentence, generations, key, change, terminal) {
     let currentSentence = sentence;
     let newSentence = '';
     let finalSentence = '';
@@ -68,7 +67,7 @@ function nextGeneration(sentence, generations, key, change) {
     let newChange = change;
     
     for (let i in currentSentence) {
-        if (Object.keys(rules).includes(currentSentence[i])) {
+        if (Object.keys(rules).includes(currentSentence[i]) && !terminal.includes(currentSentence[i])) {
             if (newChange[Object.keys(rules).toString().indexOf(currentSentence[i])/2]) {
                 for (let e of rules[currentSentence[i]][0]) {
                     if (e !== '+' && e !== '-') {
@@ -106,7 +105,7 @@ function nextGeneration(sentence, generations, key, change) {
     }
 
     const frag = document.createDocumentFragment();
-    const table = frag.appendChild(document.createElement("tr"));
+    const table = frag.appendChild(document.createElement("div"));
     
     for (let i in newSentence) {
         if (newSentence[i] !== '+' && newSentence[i] !== '-') {
@@ -139,14 +138,29 @@ function nextGeneration(sentence, generations, key, change) {
         }
     }
 
-    const spacer = document.createElement("h3");
-    spacer.innerHTML = `Generation: ${document.querySelector('#generationNum').value - generations + 1}`;
-    pageList.appendChild(spacer);
-    pageList.appendChild(table);
+    const axiomTitle = document.createElement("h4");
+    axiomTitle.innerHTML = `Axiom: ${document.querySelector('#axiom').value}`;
+    if (document.getElementById(`gen${document.querySelector('#generationNum').value - generations + 1}`) == null) {
+        const generationDiv = document.createElement("div");
+        generationDiv.setAttribute("id", `gen${document.querySelector('#generationNum').value - generations + 1}`);
+        const spacer = document.createElement("h3");
+        spacer.innerHTML = `Generation: ${document.querySelector('#generationNum').value - generations + 1}`;
+        
+        generationDiv.appendChild(spacer);
+        generationDiv.appendChild(axiomTitle);
+        generationDiv.appendChild(table);
+        pageList.appendChild(generationDiv);
+    } else {
+        const generationDiv = document.getElementById(`gen${document.querySelector('#generationNum').value - generations + 1}`);
+        
+        generationDiv.appendChild(axiomTitle);
+        generationDiv.appendChild(table);
+        pageList.appendChild(generationDiv);
+    }
     
     console.log(finalSentence);
     if (generations > 1) {
-        nextGeneration(newSentence, iterations, letterKey, newChange);
+        nextGeneration(newSentence, iterations, letterKey, newChange, terminal);
     }
 }
 
@@ -155,9 +169,10 @@ console.log('generation 0');
 start.onclick = function() {
     const totalGenerations = document.querySelector('#generationNum').value;
     const axiom = document.querySelector('#axiom').value;
-    const generationTitle = document.createElement("h2");
-    generationTitle.innerHTML = `Total Generations: ${totalGenerations} / Axiom: ${axiom}`;
-    pageList.appendChild(generationTitle);
+    const terminal = document.querySelector('#terminal').value;
+    /* const generationsList = document.querySelector('#generationsList');
+    generationsList.innerHTML += `${totalGenerations} / Axiom ${axiom}`;
+    pageList.appendChild(generationsList); */
     
-    nextGeneration(axiom, totalGenerations, 0, startingRules);
+    nextGeneration(axiom, totalGenerations, 0, startingRules, terminal);
 }
