@@ -57,7 +57,7 @@ function count(str, char, flip) {
     }
 }
 
-function nextGeneration(sentence, generations, key, change, terminal) {
+function nextGeneration(sentence, generations, key, change, terminal, ruleSet) {
     let currentSentence = sentence;
     let newSentence = '';
     let finalSentence = '';
@@ -65,6 +65,8 @@ function nextGeneration(sentence, generations, key, change, terminal) {
     let letterKey = key;
 
     let newChange = change;
+    
+    const ruleOpp = (ruleSet == 0) ? -1 : 1;
     
     for (let i in currentSentence) {
         if (Object.keys(rules).includes(currentSentence[i]) && !terminal.includes(currentSentence[i])) {
@@ -77,9 +79,9 @@ function nextGeneration(sentence, generations, key, change, terminal) {
                     }
                 }
                 if (newChange[Object.keys(rules).toString().indexOf(currentSentence[i])/2]) {
-                    newSentence += rules[currentSentence[i]][0];
+                    newSentence += rules[currentSentence[i]][ruleSet];
                 } else {
-                    newSentence += rules[currentSentence[i]][1];
+                    newSentence += rules[currentSentence[i]][ruleSet - ruleOpp];
                 }
             } else {
                 for (let e in rules[currentSentence[i]][1]) {
@@ -90,9 +92,9 @@ function nextGeneration(sentence, generations, key, change, terminal) {
                     }
                 }
                 if (newChange[Object.keys(rules).toString().indexOf(currentSentence[i])/2]) {
-                    newSentence += rules[currentSentence[i]][0];
+                    newSentence += rules[currentSentence[i]][ruleSet];
                 } else {
-                    newSentence += rules[currentSentence[i]][1];
+                    newSentence += rules[currentSentence[i]][ruleSet - ruleOpp];
                 }
             }
         } else if (currentSentence[i] == '+') {
@@ -160,7 +162,7 @@ function nextGeneration(sentence, generations, key, change, terminal) {
     
     console.log(finalSentence);
     if (generations > 1) {
-        nextGeneration(newSentence, iterations, letterKey, newChange, terminal);
+        nextGeneration(newSentence, iterations, letterKey, newChange, terminal, ruleSet);
     }
 }
 
@@ -170,9 +172,7 @@ start.onclick = function() {
     const totalGenerations = document.querySelector('#generationNum').value;
     const axiom = document.querySelector('#axiom').value;
     const terminal = document.querySelector('#terminal').value;
-    /* const generationsList = document.querySelector('#generationsList');
-    generationsList.innerHTML += `${totalGenerations} / Axiom ${axiom}`;
-    pageList.appendChild(generationsList); */
+    const ruleSet = document.querySelector('#rules').value;
     
-    nextGeneration(axiom, totalGenerations, 0, startingRules, terminal);
+    nextGeneration(axiom, totalGenerations, 0, startingRules, terminal, ruleSet);
 }
