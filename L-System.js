@@ -21,7 +21,7 @@ const rules = {
     G : ['A++D', 'F'],
     gestures : ['static', 'trills', 'tremoli', 'glissandi', 'arpeggiation', 'contrapuntal', 'articulation']
 };
-const startingRules = [true, true, true, true, true, true, true];
+const startingRules = Object.freeze([true, true, true, true, true, true, true]);
 const keyCenters = {
     'C' : ['G, D-45c', 'Bb-31c, Bb+30c', 'E-14c, Ab+41c', 'C, F#+30c', '--', 'C', 'F-29c, F#-49c'],
     'Db-20c' : ['Ab-20c, D+35c', 'Bb+50c, B+10c', 'F-35c, A+20c', 'Db-20c, G+10c', '--', 'Db', 'F#-49c, F#+30c'],
@@ -68,10 +68,11 @@ function nextGeneration(sentence, generations, key, change, terminal, ruleSet) {
     
     const ruleOpp = (ruleSet == 0) ? -1 : 1;
     
+    console.log(startingRules);
     for (let i in currentSentence) {
         if (Object.keys(rules).includes(currentSentence[i]) && !terminal.includes(currentSentence[i])) {
             if (newChange[Object.keys(rules).toString().indexOf(currentSentence[i])/2]) {
-                for (let e of rules[currentSentence[i]][0]) {
+                for (let e of rules[currentSentence[i]][ruleSet]) {
                     if (e !== '+' && e !== '-') {
                         newChange[Object.keys(rules).toString().indexOf(currentSentence[i])/2] = count(newSentence, e, newChange[Object.keys(rules).toString().indexOf(currentSentence[i])/2]);
                     } else {
@@ -84,7 +85,7 @@ function nextGeneration(sentence, generations, key, change, terminal, ruleSet) {
                     newSentence += rules[currentSentence[i]][ruleSet - ruleOpp];
                 }
             } else {
-                for (let e in rules[currentSentence[i]][1]) {
+                for (let e in rules[currentSentence[i]][ruleSet - ruleOpp]) {
                     if (e !== '+' && e !== '-') {
                         newChange[Object.keys(rules).toString().indexOf(currentSentence[i])/2] = count(newSentence, e, newChange[Object.keys(rules).toString().indexOf(currentSentence[i])/2]);
                     } else {
@@ -166,9 +167,8 @@ function nextGeneration(sentence, generations, key, change, terminal, ruleSet) {
     }
 }
 
-console.log('generation 0');
-
 start.onclick = function() {
+    console.log("STARTING");
     const totalGenerations = document.querySelector('#generationNum').value;
     const axiom = document.querySelector('#axiom').value;
     const terminal = document.querySelector('#terminal').value;
